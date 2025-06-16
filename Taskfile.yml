@@ -1,0 +1,24 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+  prepare:
+    cmds:
+      - ./scripts/prepare.sh
+    silent: true
+  verify_pat:
+    cmds:
+      - |
+        snow connection test -x \
+          --user "$SA_USER"
+    silent: true
+  verify_search_service:
+    cmds:
+      - >
+        curl --location "{{ .SNOWFLAKE_ACCOUNT_URL }}/api/v2/databases/{{ .SNOWFLAKE_DATABASE }}/schemas/{{
+        .SNOWFLAKE_SCHEMA }}/cortex-search-services/invoice_search_service:query" --header
+        'X-Snowflake-Authorization-Token-Type: PROGRAMMATIC_ACCESS_TOKEN' --header 'Content-Type: application/json'
+        --header 'Accept: application/json' --header "Authorization: Bearer $SNOWFLAKE_PASSWORD" --data '{ "query":
+        "What kind of service does Gregory have?","columns": ["CHUNK", "FILE_NAME"],"limit": 1}'
+    silent: false

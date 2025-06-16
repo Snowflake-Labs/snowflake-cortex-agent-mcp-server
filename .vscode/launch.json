@@ -1,0 +1,60 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run MCP Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "server.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "SEMANTIC_MODEL_FILE": "your_semantic_model_file_here",
+                "CORTEX_SEARCH_SERVICE": "your_cortex_search_service_here",
+                "SNOWFLAKE_ACCOUNT_URL": "your_snowflake_account_url_here",
+                "SNOWFLAKE_PASSWORD": "your_snowflake_password_here",
+                "SNOWFLAKE_WAREHOUSE": "your_snowflake_warehouse_here"
+            },
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "name": "Debug MCP Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "server.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "stopOnEntry": false,
+            "justMyCode": false,
+            "env": {
+                "SEMANTIC_MODEL_FILE": "your_semantic_model_file_here",
+                "CORTEX_SEARCH_SERVICE": "your_cortex_search_service_here",
+                "SNOWFLAKE_ACCOUNT_URL": "your_snowflake_account_url_here",
+                "SNOWFLAKE_PASSWORD": "your_snowflake_password_here",
+                "SNOWFLAKE_WAREHOUSE": "your_snowflake_warehouse_here"
+            },
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "name": "Test MCP Server with mcp-cli",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "mcp",
+            "args": [
+                "run",
+                "python",
+                "server.py"
+            ],
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "SEMANTIC_MODEL_FILE": "your_semantic_model_file_here",
+                "CORTEX_SEARCH_SERVICE": "your_cortex_search_service_here",
+                "SNOWFLAKE_ACCOUNT_URL": "your_snowflake_account_url_here",
+                "SNOWFLAKE_PASSWORD": "your_snowflake_password_here",
+                "SNOWFLAKE_WAREHOUSE": "your_snowflake_warehouse_here"
+            },
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

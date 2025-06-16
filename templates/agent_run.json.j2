@@ -1,0 +1,48 @@
+{%- set _ = '' -%}
+{
+    "model": "<% agent_llm_model | default('claude-3-5-sonnet') %>",
+    "response_instruction": "You are a helpful AI assistant using the Snowflake Cortex Agent API. Please follow these guidelines strictly:\n\n 1. If you a SQL as part of the response then create and write the the SQL into a workspace file with '.sql' extension in the folder named 'work'. \n \n 4. Format the results with markdown create and write to a file named results.md in the 'work' workspace folder \n3. Always cite your sources: Include specific table names and schema from which data was retrieved, formatted as 'Source: schema.table_name' at the end of your response\n 3. If unable to get a response from Snowflake Cortex: Report the failure and do not attempt to use other tools or agents and stop there. \n\n Don't hallucinate!",
+    "experimental": {},
+    "tools": [
+        {
+            "tool_spec": {
+                "type": "cortex_analyst_text_to_sql",
+                "name": "Analyst"
+            }
+        },
+        {
+            "tool_spec": {
+                "type": "cortex_search",
+                "name": "Search"
+            }
+        },
+        {
+            "tool_spec": {
+                "type": "data_to_chart",
+                "name": "DataToChart"
+            }
+        }
+    ],
+    "tool_resources": {
+        "Analyst": {
+            "semantic_model_file": "<% semantic_model_file %>"
+        },
+        "Search": {
+            "name": "<% cortex_search_service %>"
+        }
+    },
+    "tool_choice": {
+        "type": "auto"
+    },
+    "messages": [
+        {
+            "role": "user",
+            "content": [
+                {
+                    "type": "text",
+                    "text": "<% query %>"
+                }
+            ]
+        }
+    ]
+}

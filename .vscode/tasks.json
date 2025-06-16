@@ -1,0 +1,104 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install Dependencies",
+            "type": "shell",
+            "command": "uv",
+            "args": [
+                "sync"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run MCP Server",
+            "type": "shell",
+            "command": "uv",
+            "args": [
+                "run",
+                "server.py"
+            ],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "isBackground": true,
+            "options": {
+                "env": {
+                    "SEMANTIC_MODEL_FILE": "${env:SEMANTIC_MODEL_FILE}",
+                    "CORTEX_SEARCH_SERVICE": "${env:CORTEX_SEARCH_SERVICE}",
+                    "SNOWFLAKE_ACCOUNT_URL": "https://${env:SNOWFLAKE_ACCOUNT}.snowflakecomputing.com",
+                    "SNOWFLAKE_PASSWORD": "${env:SNOWFLAKE_PASSWORD}",
+                    "SNOWFLAKE_WAREHOUSE": "${env:SNOWFLAKE_WAREHOUSE}"
+                }
+            }
+        },
+        {
+            "label": "Test MCP Server",
+            "type": "shell",
+            "command": "uv",
+            "args": [
+                "run",
+                "python",
+                "-m",
+                "mcp",
+                "run",
+                "python",
+                "server.py"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [],
+            "options": {
+                "env": {
+                    "SEMANTIC_MODEL_FILE": "${env:SEMANTIC_MODEL_FILE}",
+                    "CORTEX_SEARCH_SERVICE": "${env:CORTEX_SEARCH_SERVICE}",
+                    "SNOWFLAKE_ACCOUNT_URL": "https://${env:SNOWFLAKE_ACCOUNT}.snowflakecomputing.com",
+                    "SNOWFLAKE_PASSWORD": "${env:SNOWFLAKE_PASSWORD}",
+                    "SNOWFLAKE_USER": "${env:SNOWFLAKE_USER}",
+                    "SNOWFLAKE_DATABASE": "${env:SNOWFLAKE_DATABASE}",
+                    "SNOWFLAKE_SCHEMA": "${env:SNOWFLAKE_SCHEMA}",
+                    "SNOWFLAKE_WAREHOUSE": "${env:SNOWFLAKE_WAREHOUSE}",
+                    "SNOWFLAKE_ROLE": "${env:SNOWFLAKE_ROLE}"
+                }
+            }
+        },
+        {
+            "label": "Lint Python Code",
+            "type": "shell",
+            "command": "uv",
+            "args": [
+                "run",
+                "ruff",
+                "check",
+                "server.py"
+            ],
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared"
+            },
+            "problemMatcher": [
+                "$python"
+            ]
+        }
+    ]
+}

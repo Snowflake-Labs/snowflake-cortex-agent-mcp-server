@@ -1,0 +1,56 @@
+{
+    "inputs": [
+        {
+            "id": "snowflake_account",
+            "type": "promptString",
+            "description": "Snowflake account identifier",
+            "default": ""
+        },
+        {
+            "id": "snowflake_user",
+            "type": "promptString",
+            "description": "Snowflake username",
+            "default": ""
+        },
+        {
+            "id": "snowflake_password",
+            "type": "promptString",
+            "description": "Snowflake password",
+            "password": true
+        },
+        {
+            "id": "snowflake_warehouse",
+            "type": "promptString",
+            "description": "Snowflake Warehouse name",
+            "default": "COMPUTE_WH"
+        },
+        {
+            "id": "semantic_model_file",
+            "type": "promptString",
+            "description": "The fully qualified Snowflake stage path to the semantic model file",
+            "default": ""
+        },
+        {
+            "id": "cortex_search_service",
+            "type": "promptString",
+            "description": "The fully qualified  name of Cortex Search Service",
+            "default": ""
+        }
+    ],
+    "servers": {
+        "snowflake-cortex-agent": {
+            "command": "uv",
+            "args": [
+                "run",
+                "server.py"
+            ],
+            "env": {
+                "SNOWFLAKE_ACCOUNT_URL": "https://${input:snowflake_account}.snowflakecomputing.com",
+                "SNOWFLAKE_PASSWORD": "${input:snowflake_password}",
+                "SEMANTIC_MODEL_FILE": "${input:semantic_model_file}",
+                "CORTEX_SEARCH_SERVICE": "${input:cortex_search_service}",
+                "SNOWFLAKE_WAREHOUSE": "${input:snowflake_warehouse}",
+            }
+        }
+    }
+}
