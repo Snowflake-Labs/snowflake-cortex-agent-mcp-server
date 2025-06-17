@@ -23,6 +23,9 @@ Ensure you have Snowflake CLI installed and configured with your account details
 
 ### Create Database Objects
 
+> [!IMPORTANT]
+> Edit the `scripts/data/support_tickets.yaml` and update the `KAMESH_MCP_DEMO` to match your DB that you will be using for the demo i.e `$SNOWFLAKE_MCP_DEMO_DATABASE`.
+
 Run the following SQL commands in your Snowflake account to create the necessary database objects:
 
 ```shell
