@@ -3,26 +3,32 @@
 version: "3"
 
 tasks:
-    prepare:
+    setup:
         cmds:
-            - ./scripts/prepare.sh
+            - ./scripts/setup.sh
+        silent: true
+
+    pat:
+        cmds:
+            - ./scripts/pat.sh
         silent: true
     build:
         cmds:
             - docker build -t ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest .
         silent: true
     verify_pat:
+        silent: false
         cmds:
             - |
                 snow connection test -x \
-                  --user "$SA_USER"
-        silent: true
+                  --user "{{ .SA_USER }}" \
+                  --role "{{ .SNOWFLAKE_MCP_DEMO_ROLE }}"
     verify_search_service:
         cmds:
             - >
-                curl --location "{{ .SNOWFLAKE_ACCOUNT_URL }}/api/v2/databases/{{ .SNOWFLAKE_DATABASE }}/schemas/{{
-                .SNOWFLAKE_SCHEMA }}/cortex-search-services/invoice_search_service:query" --header
-                'X-Snowflake-Authorization-Token-Type: PROGRAMMATIC_ACCESS_TOKEN' --header 'Content-Type:
+                curl --location "https://{{ .SNOWFLAKE_ACCOUNT }}.snowflakecomputing.com/api/v2/databases/{{
+                .SNOWFLAKE_MCP_DEMO_DATABASE }}/schemas/data/cortex-search-services/invoice_search_service:query"
+                --header 'X-Snowflake-Authorization-Token-Type: PROGRAMMATIC_ACCESS_TOKEN' --header 'Content-Type:
                 application/json' --header 'Accept: application/json' --header "Authorization: Bearer
                 $SNOWFLAKE_PASSWORD" --data '{ "query": "What kind of service does Gregory have?","columns": ["CHUNK",
                 "FILE_NAME"],"limit": 1}'
