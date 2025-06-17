@@ -9,7 +9,7 @@ tasks:
         silent: true
     build:
         cmds:
-            - docker build -t ghcr.io/kameshsampath/snowflake-cortex-mcp-server:latest .
+            - docker build -t ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest .
         silent: true
     verify_pat:
         cmds:

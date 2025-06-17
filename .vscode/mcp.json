@@ -83,7 +83,7 @@
                 "SNOWFLAKE_WAREHOUSE",
                 "-e",
                 "CORTEX_AGENT_LLM_MODEL",
-                "ghcr.io/kameshsampath/snowflake-cortex-mcp-server:latest",
+                "ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest",
             ],
             "env": {
                 "SNOWFLAKE_ACCOUNT_URL": "https://${input:snowflake_account}.snowflakecomputing.com",

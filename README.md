@@ -28,7 +28,7 @@ Run the Snowflake Cortex MCP Server using Docker, follow these steps:
 1. **Pull the Docker image:**
 
     ```bash
-    docker pull ghcr.io/kameshsampath/snowflake-cortex-mcp-server:latest
+    docker pull ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest
     ```
 
 2. **Run the Docker container:**
@@ -38,7 +38,7 @@ Run the Snowflake Cortex MCP Server using Docker, follow these steps:
     ```bash
     docker run -it --rm --name snowflake-cortex-agent \
       --env-file .env \
-      ghcr.io/kameshsampath/snowflake-cortex-mcp-server:latest
+      ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest
     ```
 
     This command will start the Snowflake Cortex MCP Server in a Docker container, allowing you to interact with it using the Model Context Protocol.
@@ -72,7 +72,7 @@ Now from any MCP compatible client, such as [VSCode](https://code.visualstudio.c
         "SNOWFLAKE_WAREHOUSE",
         "-e",
         "CORTEX_AGENT_LLM_MODEL",
-        "ghcr.io/kameshsampath/snowflake-cortex-mcp-server:latest"
+        "ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest"
       ],
       "env": {
         "SNOWFLAKE_ACCOUNT_URL": "https://${input:snowflake_account}.snowflakecomputing.com",
