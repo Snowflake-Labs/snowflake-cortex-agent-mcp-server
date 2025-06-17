@@ -25,7 +25,7 @@ SEMANTIC_MODEL_FILE = os.getenv("SEMANTIC_MODEL_FILE")
 CORTEX_SEARCH_SERVICE = os.getenv("CORTEX_SEARCH_SERVICE")
 SNOWFLAKE_ACCOUNT_URL = os.getenv("SNOWFLAKE_ACCOUNT_URL")
 SNOWFLAKE_PAT = os.getenv("SNOWFLAKE_PASSWORD")
-AGENT_LLM_MODEL = os.getenv("AGENT_LLM_MODEL", "claude-3-5-sonnet")
+AGENT_LLM_MODEL = os.getenv("CORTEX_AGENT_LLM_MODEL", "claude-3-5-sonnet")
 SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_WAREHOUSE", "COMPUTE_WH")
 
 
@@ -230,7 +230,9 @@ async def build_payload(query: str, ctx: Context) -> Dict[str, Any]:
         raise ValueError(f"Error validating JSON payload: {e}")
 
 
-@mcp.tool()
+@mcp.tool(
+    description="Run the Cortex agent with a user query using REST API and stream results via SSE.",
+)
 async def run_cortex_agents(query: str, ctx: Context) -> Dict[str, Any]:
     """Run the Cortex agent with the given query, streaming SSE."""
     # Build your payload exactly as before
