@@ -17,6 +17,46 @@ If you do not have VSCode installed, you can [download it here](https://code.vis
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (ensure MCP is enabled)
 - [Snowflake Account](https://signup.snowflake.com/)
 
+## DB Setup
+
+Ensure you have Snowflake CLI installed and configured with your account details. Preferred to have user with `ACCOUNTADMIN` role to create the required database objects, before strip down to fine-grained access control for the MCP demo.
+
+### Create Database Objects
+
+Run the following SQL commands in your Snowflake account to create the necessary database objects:
+
+```shell
+./scripts/setup.sh
+```
+
+### Programmatic Access Token
+
+We will be using a programmatic access token to authenticate with the Snowflake Cortex APIs. You can create a token by following these steps:
+
+```shell
+./scripts/pat.sh
+```
+
+Verify if the programmatic access token is created successfully and working:
+
+```shell
+ snow connection test -x \
+    --user "$SA_USER" \
+    --role "$SNOWFLAKE_MCP_DEMO_ROLE"
+```
+
+Verify if the service user is able to access the database objects created in the previous step:
+
+```shell
+ curl --location \
+   "https://$SNOWFLAKE_ACCOUNT.snowflakecomputing.com/api/v2/databases/$SNOWFLAKE_MCP_DEMO_DATABASE/schemas/data/cortex-search-services/invoice_search_service:query" \
+   --header 'X-Snowflake-Authorization-Token-Type: PROGRAMMATIC_ACCESS_TOKEN' \
+   --header 'Content-Type: application/json' --header 'Accept: application/json' \
+   --header "Authorization: Bearer $SNOWFLAKE_PASSWORD" \
+    --data '{ "query": "What kind of service does Gregory have?","columns": ["CHUNK",
+                "FILE_NAME"],"limit": 1}'
+```
+
 ## Quick Start (Easy-way)
 
 Click "Install Cortex Agent Server" badge
