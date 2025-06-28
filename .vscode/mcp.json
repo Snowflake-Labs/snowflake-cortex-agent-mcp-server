@@ -67,8 +67,6 @@
                 "run",
                 "-i",
                 "--rm",
-                "--name",
-                "snowflake-cortex-agent",
                 "-e",
                 "SNOWFLAKE_ACCOUNT_URL",
                 "-e",
