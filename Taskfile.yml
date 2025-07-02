@@ -16,6 +16,10 @@ tasks:
         cmds:
             - docker build -t ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest .
         silent: true
+    run_local:
+        cmds:
+            - docker run -it --env-file .env ghcr.io/kameshsampath/snowflake-cortex-mcp/server:latest
+        silent: true
     verify_pat:
         silent: false
         cmds:
