@@ -11,7 +11,7 @@ on:
                 type: string
 env:
     REGISTRY: ghcr.io
-    IMAGE_NAME: kameshsampath/snowflake-cortex-mcp/server
+    IMAGE_NAME: ${{ github.repository }}
 
 jobs:
     build-and-push:
