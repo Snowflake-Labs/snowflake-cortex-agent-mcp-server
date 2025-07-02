@@ -1,9 +1,17 @@
 [project]
-name = "snowflake-cortex-mcp"
-version = "0.1.0"
-description = "Add your description here"
+name = "snowflake-cortex-agent"
+version = "0.0.1"
+description = "A Model Context Protocol (MCP) server for working with Snowflake Cortex Agents."
 readme = "README.md"
 requires-python = ">=3.11"
+license = { text = "ASL-2" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+]
 dependencies = [
     "httpx>=0.28.1",
     "jinja2>=3.1.6",
@@ -15,3 +23,16 @@ dependencies = [
 dev = [
     "ipykernel>=6.29.5",
 ]
+
+[project.scripts]
+snowflake-cortex-agent = "snowflake_cortex_agent:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/snowflake_cortex_agent"]
+
+[tool.uv]
+dev-dependencies = ["ruff>=0.7.3"]

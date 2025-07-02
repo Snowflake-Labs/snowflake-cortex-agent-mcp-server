@@ -1,13 +1,14 @@
 import json
 import logging
 import os
+import re
 import uuid
 from typing import Any, Dict, List, Tuple
 
 import httpx
 from mcp.server.fastmcp import Context, FastMCP
 
-from payload_util import PayloadUtil
+from .payload_util import PayloadUtil
 
 # Configure logging to stdout
 logging.basicConfig(
@@ -17,13 +18,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger("mcp_cortex_agent")
 
-# Initialize FastMCP server
-mcp = FastMCP("cortex_agent")
-
 # Load values from environment variables or secrets
 SEMANTIC_MODEL_FILE = os.getenv("SEMANTIC_MODEL_FILE")
 CORTEX_SEARCH_SERVICE = os.getenv("CORTEX_SEARCH_SERVICE")
-SNOWFLAKE_ACCOUNT_URL = os.getenv("SNOWFLAKE_ACCOUNT_URL")
+SNOWFLAKE_ACCOUNT = os.getenv("SNOWFLAKE_ACCOUNT")
 SNOWFLAKE_PAT = os.getenv("SNOWFLAKE_PASSWORD")
 AGENT_LLM_MODEL = os.getenv("CORTEX_AGENT_LLM_MODEL", "claude-3-5-sonnet")
 SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_WAREHOUSE", "COMPUTE_WH")
@@ -34,12 +32,19 @@ required_env_vars = {
     "SEMANTIC_MODEL_FILE": SEMANTIC_MODEL_FILE,
     "CORTEX_SEARCH_SERVICE": CORTEX_SEARCH_SERVICE,
     "SNOWFLAKE_PASSWORD": SNOWFLAKE_PAT,
-    "SNOWFLAKE_ACCOUNT_URL": SNOWFLAKE_ACCOUNT_URL,
+    "SNOWFLAKE_ACCOUNT": SNOWFLAKE_ACCOUNT,
 }
 
 for var_name, var_value in required_env_vars.items():
     if not var_value:
-        raise RuntimeError(f"Set {var_name} environment variable")
+        raise ValueError(f"Set {var_name} environment variable")
+
+mcp = FastMCP("snowflake_cortex_agent")
+
+# Create SNOWFLAKE_ACCOUNT_URL with proper DNS formatting (replace underscores with dashes)
+SNOWFLAKE_ACCOUNT_URL = (
+    f"https://{re.sub(r'_', '-', SNOWFLAKE_ACCOUNT)}.snowflakecomputing.com"  # type: ignore
+)
 
 # Headers for API requests
 API_HEADERS = {
@@ -49,7 +54,7 @@ API_HEADERS = {
 }
 
 
-async def process_sse_response(resp: httpx.Response) -> Tuple[str, str, List[Dict]]:
+async def handle_response(resp: httpx.Response) -> Tuple[str, str, List[Dict]]:
     """
     Process SSE stream lines, extracting any 'delta' payloads,
     regardless of whether the JSON contains an 'event' field.
@@ -277,7 +282,7 @@ async def run_cortex_agents(query: str, ctx: Context) -> Dict[str, Any]:
             )
             resp.raise_for_status()
             # 2) Now resp.aiter_lines() will yield each "data: …" chunk
-            text, sql, citations = await process_sse_response(resp)
+            text, sql, citations = await handle_response(resp)
 
     # 3) If SQL was generated, execute it
     results = await execute_sql(sql) if sql else None
@@ -288,8 +293,3 @@ async def run_cortex_agents(query: str, ctx: Context) -> Dict[str, Any]:
         "sql": sql,
         "results": results,
     }
-
-
-if __name__ == "__main__":
-    logger.info("Starting Cortex Agent MCP server...")
-    mcp.run(transport="stdio")

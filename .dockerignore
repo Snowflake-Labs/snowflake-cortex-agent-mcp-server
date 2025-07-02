@@ -1,0 +1,7 @@
+.github
+.vscode
+.venv
+scripts
+work
+.env
+.envrc

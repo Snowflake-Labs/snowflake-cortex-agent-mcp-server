@@ -19,10 +19,7 @@ RUN apk update && apk add --no-cache \
     && rm -rf /var/cache/apk/*
 
 # Copy project files
-COPY pyproject.toml /app/
-COPY server.py /app/
-COPY payload_util.py /app/
-COPY templates/ /app/templates/
+COPY . /app/
 
 # Change ownership to mcpuser
 RUN chown -R mcpuser:mcpuser /app
@@ -30,10 +27,8 @@ RUN chown -R mcpuser:mcpuser /app
 # Switch to non-root user
 USER mcpuser
 
-# Install project dependencies as mcpuser
+# Install project dependencies and the package itself
 RUN uv sync --no-dev
 
-ENV PYTHONPATH=/app
-
-# Command to run the server
-CMD ["uv", "run", "server.py"]
+# Command to run the server using the installed script
+CMD ["uv", "run", "snowflake-cortex-agent"]
