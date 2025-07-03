@@ -24,7 +24,7 @@ CORTEX_SEARCH_SERVICE = os.getenv("CORTEX_SEARCH_SERVICE")
 SNOWFLAKE_ACCOUNT = os.getenv("SNOWFLAKE_ACCOUNT")
 SNOWFLAKE_PAT = os.getenv("SNOWFLAKE_PASSWORD")
 AGENT_LLM_MODEL = os.getenv("CORTEX_AGENT_LLM_MODEL", "claude-3-5-sonnet")
-SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_WAREHOUSE", "COMPUTE_WH")
+SNOWFLAKE_WAREHOUSE = os.getenv("SNOWFLAKE_MCP_DEMO_WAREHOUSE", "COMPUTE_WH")
 
 
 # Required environment variables
@@ -201,15 +201,13 @@ async def build_payload(query: str, ctx: Context) -> Dict[str, Any]:
         ]
     }
     """
-    await ctx.log(
-        level="info",
-        message=f"""Template variables:
+    logger.debug(
+        f"""Template variables:
             Agent LLM: {AGENT_LLM_MODEL}
             Query: {query}
             Semantic Model File: {SEMANTIC_MODEL_FILE}
             Cortex Search Service: {CORTEX_SEARCH_SERVICE}
             """,
-        logger_name="mcp_cortex_agent",
     )
     template_vars = {
         "agent_llm_model": AGENT_LLM_MODEL,
@@ -220,17 +218,18 @@ async def build_payload(query: str, ctx: Context) -> Dict[str, Any]:
 
     try:
         # Load and render the payload template
-        payload_util = PayloadUtil("templates")
+        # Get the path to the templates directory relative to this module
+        templates_dir = os.path.join(os.path.dirname(__file__), "templates")
+        payload_util = PayloadUtil(templates_dir)
         payload_json = payload_util.render_template(**template_vars)
         if payload_json:
             payload_util.validate_json(payload_json)
             return json.loads(payload_json)
         return {}
     except ValueError as e:
-        await ctx.log(
-            level="error",
-            message=f"Error validating JSON payload: {e}",
-            logger_name="mcp_cortex_agent",
+        logger.error(
+            f"Error validating JSON payload: {e}",
+            stack_info=True,
         )
         raise ValueError(f"Error validating JSON payload: {e}")
 
@@ -241,17 +240,11 @@ async def build_payload(query: str, ctx: Context) -> Dict[str, Any]:
 async def run_cortex_agents(query: str, ctx: Context) -> Dict[str, Any]:
     """Run the Cortex agent with the given query, streaming SSE."""
     # Build your payload exactly as before
-    await ctx.log(
-        level="info",
-        message=f"Running Cortex agent with query: {query}",
-        logger_name="mcp_cortex_agent",
-    )
+    logger.debug(f"Running Cortex agent with query: {query}")
     payload = await build_payload(query, ctx)
 
-    await ctx.log(
-        level="info",
-        message=f"Agent Payload:\n{payload}",
-        logger_name="mcp_cortex_agent",
+    logger.debug(
+        f"Agent Payload:\n{payload}",
     )
 
     # (Optional) generate a request ID if you want traceability
@@ -275,10 +268,8 @@ async def run_cortex_agents(query: str, ctx: Context) -> Dict[str, Any]:
                 "requestId": request_id
             },  # SQL API needs this, Cortex agent may ignore it
         ) as resp:
-            await ctx.log(
-                level="error",
-                message=f"Response:\n{resp}",
-                logger_name="mcp_cortex_agent",
+            logger.debug(
+                f"Response:\n{resp}",
             )
             resp.raise_for_status()
             # 2) Now resp.aiter_lines() will yield each "data: …" chunk
