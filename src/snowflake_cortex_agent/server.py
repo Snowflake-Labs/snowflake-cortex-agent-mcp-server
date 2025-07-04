@@ -59,7 +59,7 @@ async def handle_response(resp: httpx.Response) -> Tuple[str, str, List[Dict]]:
     Process SSE stream lines, extracting any 'delta' payloads,
     regardless of whether the JSON contains an 'event' field.
     """
-    logger.info("Processing SSE response...")
+    logger.info(f"Processing SSE response...\n{resp}")
     text, sql, citations = "", "", []
     async for raw_line in resp.aiter_lines():
         if not raw_line:
