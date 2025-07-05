@@ -9,6 +9,7 @@ snow sql --stdin <<EOF
         TYPE = SERVICE
         COMMENT = 'Service User For Cortex Agents MCP Demo';
     GRANT ROLE $SNOWFLAKE_MCP_DEMO_ROLE TO USER $SA_USER;
+    GRANT APPLY AUTHENTICATION POLICY ON USER $SA_USER TO ROLE $SNOWFLAKE_MCP_DEMO_ROLE;
 EOF
 
 # # Get GitHub Actions IP ranges only IPV4
@@ -53,28 +54,32 @@ EOF
 snow sql --query "use role accountadmin;alter user $SA_USER unset AUTHENTICATION POLICY;" || true
 snow sql --stdin <<EOF
 use role $SNOWFLAKE_MCP_DEMO_ROLE;
-create or replace authentication policy $SNOWFLAKE_MCP_DEMO_DATABASE.policies."${USER}_mcp_auth_policy"
+GRANT USAGE ON DATABASE $SNOWFLAKE_MCP_DEMO_DATABASE TO ROLE ACCOUNTADMIN;
+GRANT USAGE ON SCHEMA $SNOWFLAKE_MCP_DEMO_DATABASE.policies TO ROLE ACCOUNTADMIN;
+GRANT USAGE ON SCHEMA $SNOWFLAKE_MCP_DEMO_DATABASE.networks TO ROLE ACCOUNTADMIN;
+create or replace authentication policy $SNOWFLAKE_MCP_DEMO_DATABASE.policies.${USER}_mcp_auth_policy
   authentication_methods = ('PROGRAMMATIC_ACCESS_TOKEN')
   pat_policy = (
     default_expiry_in_days=15,
     max_expiry_in_days=30,
     network_policy_evaluation = ENFORCED_REQUIRED
   );
- alter user $SA_USER set AUTHENTICATION POLICY $SNOWFLAKE_MCP_DEMO_DATABASE.policies."${USER}_mcp_auth_policy";
+  alter user $SA_USER set AUTHENTICATION POLICY $SNOWFLAKE_MCP_DEMO_DATABASE.policies.${USER}_mcp_auth_policy;
 EOF
 
 # Create PAT for the service user
 # Check if PAT already exists
-EXISTING_PAT=$( snow sql -q "show pats for user $SA_USER" \
+EXISTING_PAT=$( snow sql -q "show user pats for user $SA_USER" \
   --format=json \
   | jq -r '.[] | select(.name|ascii_downcase == "mcp_demo") | .name')
 
 if [ -z "$EXISTING_PAT" ]; then
   # Create PAT if it doesn't exist
   echo "Creating new PAT for service user $SA_USER..."
-  SNOWFLAKE_SA_PASSWORD=$(snow sql \
+  SNOWFLAKE_SA_PASSWORD=$(snow sql --role="accountadmin" \
     --query "ALTER USER IF EXISTS $SA_USER ADD PAT mcp_demo ROLE_RESTRICTION = $SNOWFLAKE_MCP_DEMO_ROLE" \
     --format=json | jq -r '.[] | .token_secret')
+  printf "PAT:\n%s" "$SNOWFLAKE_SA_PASSWORD"
 else
   echo "PAT for service user $SA_USER already exists. Rotating PAT..."
   # Rotate PAT 

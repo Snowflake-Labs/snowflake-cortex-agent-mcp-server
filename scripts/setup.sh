@@ -14,7 +14,7 @@ snow sql --filename "${SCRIPT_DIR}/setup.sql" \
   --variable SNOWFLAKE_USER="${SNOWFLAKE_USER}"
 
 # upload the data files to the stage
-snow stage copy --overwrite "${DATA_DIR}/*" "@$SNOWFLAKE_MCP_DEMO_DATABASE.data.docs"
+snow stage copy --role "$SNOWFLAKE_MCP_DEMO_ROLE" --overwrite "${DATA_DIR}/*" "@$SNOWFLAKE_MCP_DEMO_DATABASE.data.docs"
 
 # refresh the directory table metadata to trigger streams
 snow sql --query "use role $SNOWFLAKE_MCP_DEMO_ROLE; use database $SNOWFLAKE_MCP_DEMO_DATABASE; use schema data; alter stage docs refresh;" || true

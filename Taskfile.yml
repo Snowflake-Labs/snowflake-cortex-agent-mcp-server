@@ -25,6 +25,7 @@ tasks:
         cmds:
             - |
                 snow connection test -x \
+                  --account "{{ .SNOWFLAKE_ACCOUNT }}" \
                   --user "{{ .SA_USER }}" \
                   --role "{{ .SNOWFLAKE_MCP_DEMO_ROLE }}"
     verify_search_service:
